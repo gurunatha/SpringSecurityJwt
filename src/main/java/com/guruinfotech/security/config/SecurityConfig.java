@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import com.guruinfotech.security.filter.CustomFilter;
 import com.guruinfotech.security.filter.JwtFilter;
 
 @Configuration
@@ -22,9 +22,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private JwtFilter filter;
+	@Autowired
+	private CustomFilter customFilter;
 
 	@Autowired
 	private UserDetailsService myUserDEtailService;
+
+	
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -39,10 +43,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests().antMatchers("/authenticate").permitAll().anyRequest().authenticated()
-				.and().exceptionHandling().and().sessionManagement()
+		http.headers().frameOptions().sameOrigin();
+		http.csrf().disable().authorizeRequests().antMatchers("/h2-console*/**","/registration","/authenticate", "/index").permitAll().anyRequest()
+				.authenticated().and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+		
+		// http.addFilter(filter); // Error Becoze Before or after need to be set
 
 	}
 

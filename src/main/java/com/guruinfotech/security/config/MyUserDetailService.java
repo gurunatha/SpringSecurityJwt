@@ -12,24 +12,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.guruinfotech.security.model.UserModel;
+import com.guruinfotech.security.repository.UserRepository;
+
 @Service
 public class MyUserDetailService implements UserDetailsService{
 	
-	public Map<String, String> map = new HashMap<>();
-	
-
-	public Map<String, String> getMap() {
-		return map;
-	}
-	public void setMap(Map<String, String> map) {
-		this.map = map;
-	}
+	@Autowired
+	private UserRepository repo;
 	@Autowired
 	private PasswordEncoder pass;
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		return new User("guru", pass.encode("guru"), new ArrayList<>());
+		UserModel findByUsername = repo.findByUsername(username);
+		return new User(findByUsername.getUsername(), pass.encode(findByUsername.getPassword()), new ArrayList<>());
 	}
 
 }
